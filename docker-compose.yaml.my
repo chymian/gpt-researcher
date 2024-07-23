@@ -1,0 +1,67 @@
+services:
+  gpt-researcher:
+    image: gpt-researcher/gpt-researcher
+    build: ./
+    env_file: .env
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      LLM_PROVIDER: ${LLM_PROVIDER}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER}
+      FAST_LLM_MODEL: ${FAST_LLM_MODEL}
+      SMART_LLM_MODEL: ${SMART_LLM_MODEL}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      DOC_PATH: ${DOC_PATH}
+      USER_AGENT: ${USER_AGENT}
+    expose:
+      - ${GPT_RESEARCHER_PORT}
+    restart: always
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gpt-researcher.rule=Host(`${GPT_RESEARCHER_HOST}`)"
+      - "traefik.http.services.gpt-researcher.loadbalancer.server.port=${GPT_RESEARCHER_PORT}"
+      - "traefik.http.routers.gpt-researcher.entrypoints=websecure"
+      #- "traefik.http.routers.gpt-researcher.entrypoints=web"
+      - "traefik.http.routers.gpt-researcher.tls.certResolver=letsencrypt"
+
+  gptr-nextjs:
+      pull_policy: build
+      image: gptresearcher/gptr-nextjs
+      stdin_open: true
+      env_file: .env
+      environment:
+        - CHOKIDAR_USEPOLLING=true
+      build:
+        dockerfile: Dockerfile.dev
+        context: multi_agents/frontend
+      volumes:
+        - /app/node_modules
+        - ./multi_agents/frontend:/app
+      #  - data:/my-docs
+      restart: always
+      expose:
+        - 3000
+      #extra_hosts:
+      # - "host.docker.internal:host-gateway"
+      networks:
+        - dokploy-network
+  #   labels:
+  #     - "traefik.enable=false"
+  #     - "traefik.http.routers.gpt-researcher2.rule=Host(`${GPT_RESEARCHER_HOST}`)"
+  #     - "traefik.http.services.gpt-researcher2.loadbalancer.server.port=${GPT_RESEARCHER_PORT}"
+  #     - "traefik.http.routers.gpt-researcher2.entrypoints=websecure"
+  #     #- "traefik.http.routers.gpt-researcher2.entrypoints=web"
+  #     - "traefik.http.routers.gpt-researcher2.tls.certResolver=letsencrypt"
+
+networks:
+  dokploy-network:
+    external: true
+
+volumes: 
+  data:
