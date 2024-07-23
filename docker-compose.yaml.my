@@ -22,6 +22,8 @@ services:
     restart: always
     networks:
       - dokploy-network
+      extra_hosts:
+       - "host.docker.internal:host-gateway"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gpt-researcher.rule=Host(`${GPT_RESEARCHER_HOST}`)"
@@ -32,7 +34,7 @@ services:
 
   gptr-nextjs:
       pull_policy: build
-      image: gptresearcher/gptr-nextjs
+      image: gpt-researcher/gptr-nextjs
       stdin_open: true
       env_file: .env
       environment:
@@ -47,8 +49,8 @@ services:
       restart: always
       expose:
         - 3000
-      #extra_hosts:
-      # - "host.docker.internal:host-gateway"
+      extra_hosts:
+       - "host.docker.internal:host-gateway"
       networks:
         - dokploy-network
   #   labels:
@@ -63,5 +65,5 @@ networks:
   dokploy-network:
     external: true
 
-volumes: 
-  data:
+#volumes: 
+#  data:
