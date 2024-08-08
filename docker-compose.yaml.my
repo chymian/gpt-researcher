@@ -22,8 +22,8 @@ services:
     restart: always
     networks:
       - dokploy-network
-      extra_hosts:
-       - "host.docker.internal:host-gateway"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gpt-researcher.rule=Host(`${GPT_RESEARCHER_HOST}`)"
