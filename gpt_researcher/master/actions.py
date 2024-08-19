@@ -1,11 +1,10 @@
 import asyncio
 import json
 import re
+from typing import Dict, List
 
 import json_repair
 import markdown
-
-from typing import List, Dict
 
 from gpt_researcher.master.prompts import *
 from gpt_researcher.scraper.scraper import Scraper
@@ -427,35 +426,9 @@ async def generate_report(
     report = ""
 
     if report_type == "subtopic_report":
-        content = f"{generate_prompt(query, existing_headers, relevant_written_contents, main_topic, context, report_format=cfg.report_format, total_words=cfg.total_words)}"
-        if tone:
-            content += f", tone={tone}"
-        summary = await create_chat_completion(
-            model=cfg.fast_llm_model,
-            messages=[
-                {"role": "system", "content": agent_role_prompt},
-                {"role": "user", "content": content},
-            ],
-            temperature=0,
-            llm_provider=cfg.llm_provider,
-            llm_kwargs=cfg.llm_kwargs,
-            cost_callback=cost_callback,
-        )
+        content = f"{generate_prompt(query, existing_headers, relevant_written_contents, main_topic, context, report_format=cfg.report_format, tone=tone, total_words=cfg.total_words)}"
     else:
-        content = f"{generate_prompt(query, context, report_source, report_format=cfg.report_format, total_words=cfg.total_words)}"
-        if tone:
-            content += f", tone={tone}"
-        summary = await create_chat_completion(
-            model=cfg.fast_llm_model,
-            messages=[
-                {"role": "system", "content": agent_role_prompt},
-                {"role": "user", "content": content},
-            ],
-            temperature=0,
-            llm_provider=cfg.llm_provider,
-            llm_kwargs=cfg.llm_kwargs,
-            cost_callback=cost_callback,
-        )
+        content = f"{generate_prompt(query, context, report_source, report_format=cfg.report_format, tone=tone, total_words=cfg.total_words)}"
     try:
         report = await create_chat_completion(
             model=cfg.smart_llm_model,
@@ -492,7 +465,11 @@ async def stream_output(
         None
     """
     if not websocket or logging:
-        print(output)
+        try:
+            print(output)
+        except UnicodeEncodeError:
+            # Option 1: Replace problematic characters with a placeholder
+            print(output.encode('cp1252', errors='replace').decode('cp1252'))
 
     if websocket:
         await websocket.send_json(
