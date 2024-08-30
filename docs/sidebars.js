@@ -21,6 +21,7 @@
         'gpt-researcher/introduction',
         'gpt-researcher/getting-started',
         'gpt-researcher/pip-package',
+        'gpt-researcher/frontend',
          'gpt-researcher/example',
         'gpt-researcher/troubleshooting',
       ],
@@ -35,6 +36,7 @@
         'gpt-researcher/tailored-research',
         'gpt-researcher/retrievers',
         'gpt-researcher/llms',
+        'gpt-researcher/vector-stores',
         ]
     },
     {
