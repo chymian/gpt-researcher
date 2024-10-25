@@ -20,9 +20,9 @@ services:
     build:
       dockerfile: Dockerfile.dev
       context: frontend/nextjs
-    volumes:
-      - /app/node_modules
-      - ./frontend/nextjs:/app
+    #volumes:
+    #  - /app/node_modules
+    #  - ./frontend/nextjs:/app
     restart: always
     expose:
       - 3000
